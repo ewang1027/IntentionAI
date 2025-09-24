@@ -33,12 +33,8 @@ cp env.example .env.local
 Fill in your API keys and configuration:
 ```env
 MONGODB_URI=mongodb://localhost:27017/workflow-ai
-AUTH0_SECRET=your-auth0-secret
-AUTH0_ISSUER_BASE_URL=https://your-domain.auth0.com
-AUTH0_BASE_URL=http://localhost:3000
-AUTH0_CLIENT_ID=your-auth0-client-id
-AUTH0_CLIENT_SECRET=your-auth0-client-secret
 GEMINI_API_KEY=your-gemini-api-key
+JWT_SECRET_TOKEN=your-secret-token
 ```
 
 ### 2. Install Dependencies
@@ -154,11 +150,6 @@ You can replace the placeholder files with the actual PNGs.
 ```
 
 ## Deployment
-
-### Website (Vercel)
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
 
 ### Chrome Extension
 1. Package the `chrome-extension/` folder
