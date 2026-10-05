@@ -1,217 +1,48 @@
-# Intension.ai - Emotion Detection & Productivity Tool
+# IntentionAI
 
-A comprehensive Chrome extension + hosted website that uses webcam + AI to detect user emotions while working and provide real-time suggestions with analytics.
+A Chrome extension and Next.js site that notice when you look tired or stressed while working, log it, and show you which parts of the day it tends to happen in. Team project from PennApps 2025, where it won Best Beginner.
 
-## Features
+The extension reads your webcam with face-api.js, labels each reading focused, tired, or stressed, sends it to the site, and shows a Chrome notification with a short tip at whatever interval you set. The site handles accounts, a weekly dashboard split by time of day (morning, afternoon, evening, late night), Gemini-written insights and suggestions for the week, and notification settings.
 
-- **Real-time Emotion Detection**: Uses webcam and face-api.js to detect focused, tired, and stressed states
-- **AI-Powered Suggestions**: Google Gemini API provides personalized productivity recommendations
-- **Analytics Dashboard**: Beautiful charts and insights using Recharts
-- **Chrome Notifications**: Smart notifications with customizable intervals
-- **User Authentication**: Auth0 integration with email and Google login
-- **Data Persistence**: MongoDB storage for emotion events and user preferences
+## How it's put together
 
-## Tech Stack
+- **Extension** (`chrome-extension/`, Manifest V3). Loads face-api.js and its models from a CDN, runs the tiny face detector and expression model on webcam frames, and maps the expression scores onto the three states: sad and neutral count toward tired, angry, fearful and disgusted toward stressed, neutral and surprised toward focused.
+- **Auth.** Email and password, hashed with bcrypt. The server returns a JWT good for 7 days. The dashboard shows your token so you can paste it into the extension popup, which then sends it as a Bearer token with each reading.
+- **Database.** MongoDB through Mongoose. Two models: `User` (profile and notification settings) and `EmotionEvent` (state, confidence, time of day).
+- **Gemini.** `gemini-1.5-flash` over the REST API, called from `/api/insights` and `/api/suggestions` with the week's percentages.
 
-- **Frontend**: Next.js 15, React 19, TailwindCSS, shadcn/ui
-- **Backend**: Next.js API routes + MongoDB (Mongoose)
-- **Authentication**: Auth0
-- **ML Model**: face-api.js for emotion recognition
-- **Charts**: Recharts (stacked bar charts)
-- **AI Suggestions**: Google Gemini API
-- **Browser Extension**: Manifest v3, service worker, content scripts
+## API
 
-## Quick Start
+| Route | Purpose |
+|---|---|
+| `POST /api/auth/custom-register`, `POST /api/auth/custom-login` | Sign up or log in, returns a JWT |
+| `POST /api/extension-auth` | Check a token pasted into the extension |
+| `POST /api/emotions` | Record one reading |
+| `GET /api/emotions?week=current` | Counts per state and time of day (`week=previous` for last week) |
+| `POST /api/insights`, `POST /api/suggestions` | Gemini summaries of the week |
+| `GET`, `PUT`, `DELETE /api/user` | Profile, settings, account deletion |
 
-### 1. Environment Setup
+## Running it locally
 
-Copy the environment template:
-```bash
-cp env.example .env.local
+You need Node 18.18 or newer, a MongoDB instance, and a Gemini API key. Create `.env.local`:
+
 ```
-
-Fill in your API keys and configuration:
-```env
 MONGODB_URI=mongodb://localhost:27017/workflow-ai
-GEMINI_API_KEY=your-gemini-api-key
-JWT_SECRET_TOKEN=your-secret-token
+JWT_SECRET=some-long-random-string
+GEMINI_API_KEY=...
 ```
-
-### 2. Install Dependencies
 
 ```bash
 npm install
+npm run dev    # http://localhost:3000
 ```
 
-### 3. Run Dependency Check
+To load the extension, open `chrome://extensions`, turn on Developer mode, click "Load unpacked", and pick `chrome-extension/`. Make an account on the site, copy the token from the dashboard, and paste it into the extension popup.
 
-```bash
-npm run check-deps
-```
+## Notes
 
-### 4. Start Development Server
-
-```bash
-npm run dev
-```
-
-Visit `http://localhost:3000` to see the website.
-
-### 5. Load Chrome Extension
-
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable "Developer mode"
-3. Click "Load unpacked" and select the `chrome-extension/` folder
-4. The extension will appear in your browser toolbar
-
-## Project Structure
-
-```
-├── src/
-│   ├── app/                    # Next.js app router
-│   │   ├── api/               # API routes
-│   │   ├── dashboard/         # Dashboard page
-│   │   └── page.tsx           # Landing page
-│   ├── components/ui/         # shadcn/ui components
-│   ├── lib/                   # Utilities (auth, db, gemini)
-│   └── models/                # MongoDB schemas
-├── chrome-extension/          # Chrome extension files
-│   ├── manifest.json         # Extension manifest
-│   ├── popup.html            # Extension popup UI
-│   ├── popup.js              # Popup logic
-│   ├── background.js         # Service worker
-│   ├── content.js            # Content script
-│   └── face-detection.js     # Emotion detection
-├── scripts/
-│   └── check-deps.js         # Dependency validation
-└── README.md
-```
-
-## Logos
-
-All branding logos should be placed in `/public/logos/`. These are referenced in code via `/logos/logo1.png`, `/logos/logo2.png`, etc.
-
-### Logo Files
-- `logo1.png` - intention.ai with cube
-- `logo2.png` - intentionalai
-- `logo3.png` - intentional
-- `logo4.png` - intentional highlighted
-
-You can replace the placeholder files with the actual PNGs.
-
-## API Endpoints
-
-- `POST /api/emotions` - Record emotion event
-- `GET /api/emotions?week=current` - Get emotion analytics
-- `POST /api/suggestions` - Get AI suggestions
-- `GET /api/user` - Get user profile
-- `PUT /api/user` - Update user settings
-
-## Chrome Extension
-
-### Features
-- **Webcam Monitoring**: Continuous emotion detection via webcam
-- **Smart Notifications**: AI-powered suggestions with customizable intervals
-- **Settings Management**: Toggle monitoring and notifications
-- **Dashboard Access**: Quick link to web dashboard
-- **Recent History**: View recent emotion detections
-
-### Permissions
-- `storage` - Save user settings
-- `notifications` - Show AI suggestions
-- `activeTab` - Access current tab
-- `scripting` - Inject content scripts
-
-## MongoDB Schema
-
-### User
-```javascript
-{
-  auth0Id: String (unique),
-  email: String,
-  name: String,
-  settings: {
-    notificationInterval: Number (default: 15),
-    notificationsEnabled: Boolean (default: true),
-    webcamEnabled: Boolean (default: true)
-  }
-}
-```
-
-### EmotionEvent
-```javascript
-{
-  userId: ObjectId,
-  timestamp: Date,
-  emotion: String (enum: ["focused", "tired", "stressed"]),
-  confidence: Number,
-  timeOfDay: String (enum: ["morning", "afternoon", "evening", "late_night"])
-}
-```
-
-## Deployment
-
-### Chrome Extension
-1. Package the `chrome-extension/` folder
-2. Submit to Chrome Web Store
-3. Or distribute as unpacked extension
-
-## Development
-
-### Dependency Management
-The project includes a comprehensive dependency check script:
-- Validates all required environment variables
-- Checks for outdated packages
-- Tests MongoDB connection
-- Verifies API configurations
-
-Run before deployment:
-```bash
-npm run check-deps
-```
-
-### Adding New Features
-1. Update API routes in `src/app/api/`
-2. Add UI components in `src/components/`
-3. Update Chrome extension in `chrome-extension/`
-4. Test with dependency check script
-
-## Troubleshooting
-
-### Common Issues
-
-1. **MongoDB Connection Failed**
-   - Check `MONGODB_URI` in `.env.local`
-   - Ensure MongoDB is running locally or use cloud instance
-
-2. **Auth0 Authentication Issues**
-   - Verify Auth0 domain and client credentials
-   - Check callback URLs in Auth0 dashboard
-
-3. **Gemini API Errors**
-   - Ensure `GEMINI_API_KEY` is set correctly
-   - Check API quotas and billing
-
-4. **Chrome Extension Not Working**
-   - Check browser console for errors
-   - Verify webcam permissions
-   - Ensure all files are loaded correctly
-
-### Debug Mode
-Set `NODE_ENV=development` for detailed error logging.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run dependency check: `npm run check-deps`
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details.
-
----
-
-**Built with LOVE for PennApps 2025**
+- The extension talks to `http://localhost:3000`; the URL is hardcoded in `popup.js` and `background.js`.
+- In Chrome the extension is still called "WorkFlow AI", the project's working name.
+- If the webcam detector hasn't produced a reading, the extension falls back to a guess based on the time of day.
+- Notification tips are fixed text per state. Gemini is only used on the dashboard.
+- Auth0 was removed in favor of the JWT login above. `env.example` still lists the old Auth0 variables, and the `/oauth` page and the settings page's log-out button still point at `/api/auth/*` routes that no longer exist.
