@@ -9,7 +9,7 @@ This comprehensive Chrome extension + hosted website project has been fully impl
 ### 1. **Next.js Website (Vercel Ready)**
 - **Landing Page**: Beautiful, responsive design with feature highlights
 - **Dashboard**: Analytics dashboard with stacked bar charts (Recharts)
-- **Authentication**: Auth0 integration with email + Google login
+- **Authentication**: Email and password login with bcrypt hashing and a JWT
 - **API Routes**: Complete REST API for emotions, suggestions, and user management
 - **UI Components**: shadcn/ui components with TailwindCSS styling
 
@@ -44,7 +44,8 @@ pennapps-project/
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── auth/[...auth0]/route.ts
+│   │   │   ├── auth/custom-login/route.ts
+│   │   │   ├── auth/custom-register/route.ts
 │   │   │   ├── emotions/route.ts
 │   │   │   ├── suggestions/route.ts
 │   │   │   └── user/route.ts
@@ -56,9 +57,10 @@ pennapps-project/
 │   │   ├── card.tsx
 │   │   └── dropdown-menu.tsx
 │   ├── lib/
-│   │   ├── auth0.ts
+│   │   ├── auth.ts
 │   │   ├── db.ts
 │   │   ├── gemini.ts
+│   │   ├── password.ts
 │   │   └── utils.ts
 │   ├── models/
 │   │   ├── User.ts
@@ -85,7 +87,7 @@ pennapps-project/
 - **React 19** with TypeScript
 - **TailwindCSS** + shadcn/ui components
 - **MongoDB** with Mongoose ODM
-- **Auth0** authentication
+- **JWT** auth with jsonwebtoken and bcryptjs
 - **Google Gemini API** for AI suggestions
 - **face-api.js** for emotion detection
 - **Recharts** for analytics visualization
@@ -112,11 +114,7 @@ pennapps-project/
 Create `.env.local` with:
 ```env
 MONGODB_URI=mongodb://localhost:27017/workflow-ai
-AUTH0_SECRET=your-auth0-secret
-AUTH0_ISSUER_BASE_URL=https://your-domain.auth0.com
-AUTH0_BASE_URL=http://localhost:3000
-AUTH0_CLIENT_ID=your-auth0-client-id
-AUTH0_CLIENT_SECRET=your-auth0-client-secret
+JWT_SECRET=some-long-random-string
 GEMINI_API_KEY=your-gemini-api-key
 ```
 
@@ -151,12 +149,12 @@ npm run deploy  # Validates and prepares for deployment
 ## All Requirements Met
 
 **Chrome Extension**: Manifest v3, background service worker, popup UI  
-**Website**: Next.js on Vercel with Auth0 + MongoDB  
+**Website**: Next.js on Vercel with MongoDB  
 **Emotion Detection**: face-api.js integration  
 **AI Suggestions**: Gemini API with multiple prompt types  
 **Analytics**: Recharts stacked bar charts  
 **Notifications**: Chrome notifications API  
-**Authentication**: Auth0 with email + Google login  
+**Authentication**: Email and password with a JWT  
 **Database**: MongoDB schemas for User and EmotionEvent  
 **Dependency Management**: Comprehensive check script  
 **Error Handling**: Graceful failures with descriptive messages  
