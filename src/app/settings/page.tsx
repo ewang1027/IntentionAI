@@ -17,12 +17,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
-  settings?: {
-    notifications?: {
-      push?: boolean;
-      frequency?: string; // in minutes: '15', '30', '45', '60'
-    };
-  };
+  settings?: Partial<UserSettings>;
 }
 
 export default function SettingsPage() {
@@ -39,8 +34,6 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [editableName, setEditableName] = useState('');
-  const [editableEmail, setEditableEmail] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -79,14 +72,6 @@ export default function SettingsPage() {
     return null;
   };
 
-  // Get safe notification settings with defaults
-  const getNotificationSettings = () => {
-    return {
-      push: user?.settings?.notifications?.push ?? false,
-      frequency: user?.settings?.notifications?.frequency ?? '30'
-    };
-  };
-
   // Fetch user data and settings
   const fetchUserData = async () => {
     try {
@@ -100,13 +85,17 @@ export default function SettingsPage() {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
+        cache: 'no-store',
       });
 
       if (response.ok) {
-        const userData = await response.json();
+        const { user: userData } = await response.json();
         setUser(userData);
-        setEditableName(userData.name || '');
-        setEditableEmail(userData.email || '');
+        setSettings({
+          notificationInterval: userData.settings?.notificationInterval ?? 15,
+          notificationsEnabled: userData.settings?.notificationsEnabled ?? true,
+          webcamEnabled: userData.settings?.webcamEnabled ?? true
+        });
       } else if (response.status === 401) {
         localStorage.removeItem('token');
         window.location.href = '/auth';
@@ -137,20 +126,15 @@ export default function SettingsPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          name: editableName,
-          email: editableEmail,
-          settings: {
-            notifications: getNotificationSettings()
-          },
-        }),
+        body: JSON.stringify({ settings }),
       });
 
       if (response.ok) {
         setSaveMessage('Settings saved successfully!');
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
-        setSaveMessage('Failed to save settings');
+        const errorData = await response.json().catch(() => ({}));
+        setSaveMessage(`Failed to save settings: ${errorData.error || response.status}`);
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -204,16 +188,12 @@ export default function SettingsPage() {
         setSaveMessage('Password changed successfully!');
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
-        const errorData = await response.json();
-        setPasswordErrors([errorData.error || 'Failed to change password']);
+        const errorData = await response.json().catch(() => ({}));
+        setPasswordErrors(errorData.details || [errorData.error || 'Failed to change password']);
       }
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        alert('Request timed out. Please try again.');
-      } else {
-        console.error('Error deleting account:', error);
-        alert('Error deleting account. Please try again.');
-      }
+      console.error('Error changing password:', error);
+      setPasswordErrors(['Error changing password. Please try again.']);
     } finally {
       setIsChangingPassword(false);
     }
@@ -439,10 +419,28 @@ export default function SettingsPage() {
               </div>
               
               <div>
+                <label className="block text-sm font-medium mb-2" style={{color: darkModeStyles.text}}>Current Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter current password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 focus:ring-2 focus:border-transparent"
+                  style={{
+                    borderColor: darkModeStyles.border,
+                    backgroundColor: isDarkMode ? '#1a1a1a' : '#f9fafb',
+                    color: darkModeStyles.text,
+                  }}
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium mb-2" style={{color: darkModeStyles.text}}>New Password</label>
                 <input
                   type="password"
                   placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 focus:ring-2 focus:border-transparent"
                   style={{
                     borderColor: darkModeStyles.border,
@@ -457,6 +455,8 @@ export default function SettingsPage() {
                 <input
                   type="password"
                   placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 focus:ring-2 focus:border-transparent"
                   style={{
                     borderColor: darkModeStyles.border,
@@ -465,6 +465,23 @@ export default function SettingsPage() {
                   }}
                 />
               </div>
+
+              {passwordErrors.length > 0 && (
+                <ul className="p-4 rounded-lg bg-red-100 text-red-800 text-sm list-disc list-inside">
+                  {passwordErrors.map((err) => (
+                    <li key={err}>{err}</li>
+                  ))}
+                </ul>
+              )}
+
+              <Button
+                onClick={changePassword}
+                disabled={isChangingPassword}
+                className="w-full py-3 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-105"
+                style={{backgroundColor: '#677d61', color: '#ffffff'}}
+              >
+                {isChangingPassword ? 'Changing Password...' : 'Change Password'}
+              </Button>
             </div>
           </div>
 

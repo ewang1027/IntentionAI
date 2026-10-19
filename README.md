@@ -45,4 +45,4 @@ To load the extension, open `chrome://extensions`, turn on Developer mode, click
 - In Chrome the extension is still called "WorkFlow AI", the project's working name.
 - If the webcam detector hasn't produced a reading, the extension falls back to a guess based on the time of day.
 - Notification tips are fixed text per state. Gemini is only used on the dashboard.
-- The settings page is only partly wired up. Its toggles, slider and password fields don't save anything yet.
+- The settings page saves the notification and webcam settings to your account, but the extension doesn't read them. It uses its own popup toggles and a fixed 15 minute notification interval.
