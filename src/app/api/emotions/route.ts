@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
 
     const user = await User.findById(decoded.userId);
     if (!user) {
@@ -74,6 +77,9 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
 
     const user = await User.findById(decoded.userId);
     if (!user) {
@@ -84,7 +90,7 @@ export async function GET(request: NextRequest) {
     const week = searchParams.get('week') || 'current';
     const since = searchParams.get('since'); // ISO timestamp for incremental updates
     
-    let query: any = { userId: user._id };
+    const query: Record<string, unknown> = { userId: user._id };
     
     if (since) {
       // Get only events since the specified timestamp

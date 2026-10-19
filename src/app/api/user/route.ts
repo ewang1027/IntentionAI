@@ -20,6 +20,9 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
 
     await dbConnect();
     const user = await User.findById(decoded.userId);
@@ -53,6 +56,9 @@ export async function PUT(request: NextRequest) {
     try {
       decoded = verifyToken(token);
     } catch (error) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
@@ -124,6 +130,9 @@ export async function DELETE(request: NextRequest) {
     try {
       decoded = verifyToken(token);
     } catch (error) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 

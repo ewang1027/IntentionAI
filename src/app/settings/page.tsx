@@ -5,9 +5,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Bell, User, Trash2, Save, AlertTriangle, Moon, Sun, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import LogoButton from '@/components/LogoButton';
-// import { useUser } from '@auth0/nextjs-auth0/client';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+
+interface UserSettings {
+  notificationInterval: number;
+  notificationsEnabled: boolean;
+  webcamEnabled: boolean;
+}
 
 interface User {
   _id: string;
@@ -22,9 +26,8 @@ interface User {
 }
 
 export default function SettingsPage() {
-  // const { user, isLoading } = useUser();
-  const user = { name: 'Demo User', email: 'demo@example.com' }; // Demo user for now
-  const isLoading = false;
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>({
     notificationInterval: 15,
@@ -36,6 +39,14 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [editableName, setEditableName] = useState('');
+  const [editableEmail, setEditableEmail] = useState('');
+  const [saveMessage, setSaveMessage] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -539,6 +550,7 @@ export default function SettingsPage() {
               {isSaving ? 'Saving Settings...' : 'Save Settings'}
             </Button>
           </div>
+        </div>
         </div>
       </main>
     </div>

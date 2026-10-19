@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { User, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export default function TestIconsPage() {
@@ -43,7 +44,7 @@ export default function TestIconsPage() {
             <h2 className="text-xl font-semibold mb-4">Test Navigation</h2>
             <div className="space-x-4">
               <a href="/auth" className="text-blue-500 hover:underline">Go to Auth Page</a>
-              <a href="/" className="text-blue-500 hover:underline">Go to Home</a>
+              <Link href="/" className="text-blue-500 hover:underline">Go to Home</Link>
             </div>
           </div>
         </div>

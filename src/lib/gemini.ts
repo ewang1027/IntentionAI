@@ -33,7 +33,7 @@ export async function getGeminiSuggestion(prompt: string): Promise<string> {
       throw new Error(`❌ Gemini API request failed: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json() as any;
+    const data = await response.json() as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
     return data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ No suggestion available.";
   } catch (error) {
     console.error("Gemini API error:", error);
@@ -52,12 +52,12 @@ export async function getRecurringSuggestion(emotion: string, timeOfDay: string)
   return getGeminiSuggestion(prompt);
 }
 
-export async function getAnalyticsSummary(emotionData: any): Promise<string> {
+export async function getAnalyticsSummary(emotionData: unknown): Promise<string> {
   const prompt = `Based on the following weekly emotion distribution data, provide a 2-3 sentence summary: ${JSON.stringify(emotionData)}. Focus on patterns and insights.`;
   return getGeminiSuggestion(prompt);
 }
 
-export async function getWeeklySuggestions(emotionData: any): Promise<string> {
+export async function getWeeklySuggestions(emotionData: unknown): Promise<string> {
   const prompt = `Based on this weekly emotion distribution, suggest 2-3 ways the user can improve their workflow: ${JSON.stringify(emotionData)}. Make suggestions specific and actionable.`;
   return getGeminiSuggestion(prompt);
 }

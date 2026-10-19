@@ -16,6 +16,9 @@ export async function POST(request: NextRequest) {
 
     // Verify the JWT token
     const decoded = verifyToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
     const user = await User.findById(decoded.userId);
     
     if (!user) {

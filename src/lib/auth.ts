@@ -8,7 +8,7 @@ export interface AuthenticatedUser {
   email: string;
   name: string;
   emailVerified: boolean;
-  settings: any;
+  settings: unknown;
 }
 
 /**

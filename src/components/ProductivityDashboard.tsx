@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { TrendingUp, AlertTriangle, Lightbulb, CheckCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, AlertTriangle, Lightbulb, CheckCircle, Brain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,6 +15,7 @@ interface TimeRangeData {
 
 interface ProductivityDashboardProps {
   timeRangeData: TimeRangeData[];
+  isDarkMode?: boolean;
   viewMode?: 'daily' | 'weekly';
 }
 
@@ -28,6 +27,7 @@ interface Insight {
 
 const ProductivityDashboard: React.FC<ProductivityDashboardProps> = ({ 
   timeRangeData, 
+  isDarkMode = false,
   viewMode = 'daily'
 }) => {
   const [hoveredPeriod, setHoveredPeriod] = useState<string | null>(null);

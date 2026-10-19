@@ -10,6 +10,20 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import ProductivityDashboard from '@/components/ProductivityDashboard';
 
+type EmotionCounts = { focused: number; tired: number; stressed: number };
+
+interface EmotionEventItem {
+  _id: string;
+  timestamp: string;
+  timeOfDay: string;
+  emotion: string;
+}
+
+interface EmotionData {
+  events: EmotionEventItem[];
+  analytics: Record<'morning' | 'afternoon' | 'evening' | 'late_night', EmotionCounts>;
+}
+
 export default function Dashboard() {
   // const { user, isLoading } = useUser();
   const user = { name: 'Demo User', email: 'demo@example.com' };
@@ -18,7 +32,7 @@ export default function Dashboard() {
   const [viewMode, setViewMode] = useState<'daily' | 'weekly'>('daily');
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [emotionData, setEmotionData] = useState<any>(null);
+  const [emotionData, setEmotionData] = useState<EmotionData | null>(null);
   const [emotionLoading, setEmotionLoading] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [token, setToken] = useState<string | null>(null);
@@ -81,8 +95,8 @@ export default function Dashboard() {
         if (emotionData && data.events && data.events.length > 0) {
           // Merge new events with existing ones
           const existingEvents = emotionData.events || [];
-          const newEvents = data.events.filter((newEvent: any) => 
-            !existingEvents.some((existingEvent: any) => existingEvent._id === newEvent._id)
+          const newEvents = data.events.filter((newEvent: EmotionEventItem) => 
+            !existingEvents.some((existingEvent: EmotionEventItem) => existingEvent._id === newEvent._id)
           );
           
           if (newEvents.length > 0) {
@@ -103,7 +117,7 @@ export default function Dashboard() {
               late_night: { focused: 0, tired: 0, stressed: 0 }
             };
 
-            allEvents.forEach((event: any) => {
+            allEvents.forEach((event: EmotionEventItem) => {
               const timeOfDay = event.timeOfDay as keyof typeof analytics;
               const emotion = event.emotion as 'focused' | 'tired' | 'stressed';
               analytics[timeOfDay][emotion]++;
@@ -518,7 +532,6 @@ export default function Dashboard() {
               <TrendingUp className="h-4 w-4 mr-2 inline" style={{color: viewMode === 'weekly' ? '#ffffff' : (isDarkMode ? '#e5e5e5' : '#374151')}} />
               Weekly
             </motion.button>
-            </button>
 
 
             {/* View Toggle */}
@@ -755,7 +768,7 @@ export default function Dashboard() {
                     <li>Install the WorkFlow AI Chrome extension</li>
                     <li>Click the extension icon in your browser</li>
                     <li>Paste this token in the authentication field</li>
-                    <li>Click "Connect Account" to start syncing data</li>
+                    <li>Click &quot;Connect Account&quot; to start syncing data</li>
                   </ol>
                 </div>
               </div>

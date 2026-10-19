@@ -99,7 +99,7 @@ const Preview = () => {
                         <div>
                           <h4 className="font-semibold text-slate-900 mb-1">Peak Performance</h4>
                           <p className="text-sm text-slate-600">
-                            You're most productive between 10-11 AM. Schedule important tasks during this time.
+                            You&apos;re most productive between 10-11 AM. Schedule important tasks during this time.
                           </p>
                         </div>
                       </div>
