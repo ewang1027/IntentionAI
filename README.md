@@ -2,7 +2,7 @@
 
 A Chrome extension and Next.js site that notice when you look tired or stressed while working, log it, and show you which parts of the day it tends to happen in. Team project from PennApps 2025, where it won Best Beginner.
 
-The extension reads your webcam with face-api.js, labels each reading focused, tired, or stressed, sends it to the site, and shows a Chrome notification with a short tip at whatever interval you set. The site handles accounts, a weekly dashboard split by time of day (morning, afternoon, evening, late night), Gemini-written insights and suggestions for the week, and notification settings.
+The extension reads your webcam with face-api.js, labels each reading focused, tired, or stressed, sends it to the site, and shows a Chrome notification with a short tip every 15 minutes. The site handles accounts, a weekly dashboard split by time of day (morning, afternoon, evening, late night), Gemini-written insights and suggestions for the week, and notification settings.
 
 ## How it's put together
 
