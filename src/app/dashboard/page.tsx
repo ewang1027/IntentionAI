@@ -6,7 +6,6 @@ import { ArrowLeft, BarChart3, Brain, Clock, Calendar, TrendingUp, Settings, Moo
 import Link from 'next/link';
 import LogoButton from '@/components/LogoButton';
 import { motion } from 'framer-motion';
-// import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import ProductivityDashboard from '@/components/ProductivityDashboard';
 
@@ -25,7 +24,6 @@ interface EmotionData {
 }
 
 export default function Dashboard() {
-  // const { user, isLoading } = useUser();
   const user = { name: 'Demo User', email: 'demo@example.com' };
   const isLoading = false;
   const router = useRouter();

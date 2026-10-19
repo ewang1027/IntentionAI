@@ -105,11 +105,7 @@ Make sure these are set in your Vercel dashboard:
 
 ```env
 MONGODB_URI=your-mongodb-connection-string
-AUTH0_SECRET=your-auth0-secret
-AUTH0_ISSUER_BASE_URL=https://your-domain.auth0.com
-AUTH0_BASE_URL=https://your-app-name.vercel.app
-AUTH0_CLIENT_ID=your-auth0-client-id
-AUTH0_CLIENT_SECRET=your-auth0-client-secret
+JWT_SECRET=some-long-random-string
 GEMINI_API_KEY=your-gemini-api-key
 ```
 

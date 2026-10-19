@@ -480,7 +480,7 @@ export default function SettingsPage() {
             
             <div className="space-y-4">
               <Button
-                onClick={() => window.location.href = '/api/auth/logout'}
+                onClick={handleLogout}
                 className="w-full py-3 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-105"
                 style={{backgroundColor: '#93a57b', color: '#ffffff'}}
               >
